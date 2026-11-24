@@ -7,7 +7,7 @@ import { ORBIT_RENDER } from '../sim/constants.js';
 import Earth from './Earth.jsx';
 import Satellites from './Satellites.jsx';
 import Pin from './Pin.jsx';
-import { RangeCircles, SignalRays, FixMarkers, IterationPath } from './Overlays.jsx';
+import { RangeSpheres, RangeCircles, SignalRays, FixMarkers, IterationPath } from './Overlays.jsx';
 import { DragController, CameraRig } from './Controllers.jsx';
 
 /** A light that rides along with the camera, so the side of Earth you look at is always lit. */
@@ -73,6 +73,7 @@ export default function GlobeScene({ sim, hidden }) {
             <Earth ref={setEarth} xray={xray} />
           </Suspense>
           <OrbitShell />
+          <RangeSpheres sim={sim} />
           <RangeCircles sim={sim} />
           <SignalRays sim={sim} />
           <Satellites sim={sim} occ={occ} />

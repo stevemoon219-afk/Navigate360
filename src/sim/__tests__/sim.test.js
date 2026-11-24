@@ -7,7 +7,7 @@ import { gaussNewton4 } from '../solver4.js';
 import { trilaterate3 } from '../solver3.js';
 import { solve3Surface } from '../solver3Surface.js';
 import { computeDop } from '../dop.js';
-import { earthCircle } from '../rangeCircle.js';
+import { earthCircle, sphereSphereCircle } from '../rangeCircle.js';
 import { simulate } from '../simulate.js';
 import { sweepClock } from '../sweep.js';
 import { runSelfTest } from '../selfTest.js';
@@ -107,6 +107,18 @@ describe('solvers', () => {
       const closest = Math.min(...pts.map((p) => dist(p, truth)));
       expect(closest).toBeLessThan(R_EARTH * 2 * Math.PI / 2000); // within one segment
     });
+  });
+
+  it('every pair of 3D distance spheres meets in a circle through the phone', () => {
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) {
+      const pts = sphereSphereCircle(sats[i], ranges[i], sats[j], ranges[j], { segments: 4000 });
+      pts.forEach((p) => {
+        expect(Math.abs(dist(p, sats[i]) - ranges[i])).toBeLessThan(1e-3);
+        expect(Math.abs(dist(p, sats[j]) - ranges[j])).toBeLessThan(1e-3);
+      });
+      const closest = Math.min(...pts.map((p) => dist(p, truth)));
+      expect(closest).toBeLessThan(2 * Math.PI * R_EARTH * 4 / 4000);
+    }
   });
 
   it('known-clock DOP has smaller VDOP (the clock is tangled with height)', () => {

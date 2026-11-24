@@ -38,10 +38,13 @@ function Maths() {
       <span className="eq">Q = (GᵀG)⁻¹    HDOP = √(q_EE + q_NN)    VDOP = √q_UU    σ_position ≈ DOP × σ_range</span>
       <p>Dilution of precision depends only on satellite directions. Bunched satellites give large DOP. Height is usually worst because all satellites are above you, so the “up” column of G
         looks like the clock column of 1s. Lowering yourself and having a slow clock change the distances in almost the same way.</p>
-      <h3>5. Range circles on the globe</h3>
+      <h3>5. Range spheres in 3D</h3>
+      <span className="eq">|r − sᵢ| = ρᵢ    (one sphere per satellite)</span>
+      <p>Each measured distance ρᵢ puts you somewhere on a sphere of radius ρᵢ around satellite i, so trilateration is done with spheres in 3D space, not flat circles.
+        Two spheres cross along a circle in space; the 3D rings on the globe are these crossings. A third sphere cuts that ring in two points (your position and its mirror, far out in space).
+        With true distances all rings meet at your phone. With a wrong clock every sphere is 300 km/ms too big and they miss.</p>
       <span className="eq">cos θ = (R² + d² − ρ²) / (2·R·d)</span>
-      <p>Law of cosines: the sphere of radius ρ around a satellite at distance d from Earth’s centre touches the surface along a circle of angular radius θ. With true distances all
-        circles cross at your phone. With a wrong clock they miss.</p>
+      <p>Where a sphere touches the (spherical) Earth is a circle of angular radius θ on the ground, from the law of cosines (d = satellite’s distance from Earth’s centre).</p>
     </>
   );
 }

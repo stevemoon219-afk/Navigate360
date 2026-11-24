@@ -1,11 +1,11 @@
-// Range circles, signal rays, fix markers and the solver's iteration path.
+// Range spheres (3D), range circles, signal rays, fix markers and the solver's iteration path.
 import React, { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Line, Html } from '@react-three/drei';
 import { useStore } from '../state/store.js';
 import { ecefToRender, latLonToEcef, ecefToLatLon } from '../sim/geo.js';
-import { earthCircle } from '../sim/rangeCircle.js';
+import { earthCircle, sphereSphereCircle } from '../sim/rangeCircle.js';
 import { normalize, scale, add } from '../sim/linalg.js';
 import { R_EARTH } from '../sim/constants.js';
 import { fmtDist } from '../ui/format.js';
@@ -30,6 +30,75 @@ export function RangeCircles({ sim }) {
       {show.circles && circles.map((c) => c.pts && <Line key={c.id} points={c.pts} color={color(c.id)} lineWidth={2.6} />)}
       {show.corrected && mode !== '3' && circles.map((c) => c.corrected && (
         <Line key={'c' + c.id} points={c.corrected} color="#ffffff" lineWidth={1.4} dashed dashSize={0.02} gapSize={0.012} transparent opacity={0.85} />
+      ))}
+    </group>
+  );
+}
+
+// Soap-bubble look: faint in the middle, brighter at the rim, so you can see a sphere's shape
+// while still looking through it. Fades out when the camera is close to the ground (the phone sits on every sphere).
+const bubbleVert = `varying vec3 vN; varying vec3 vV;
+void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`;
+const bubbleFrag = `uniform vec3 uColor; uniform float uFade; varying vec3 vN; varying vec3 vV;
+void main(){ float f = 1.0 - abs(dot(normalize(vN), normalize(vV))); gl_FragColor = vec4(uColor, (0.03 + 0.28 * pow(f, 3.0)) * uFade); }`;
+
+function RangeSphere({ center, radius, color }) {
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    vertexShader: bubbleVert, fragmentShader: bubbleFrag,
+    uniforms: { uColor: { value: new THREE.Color(color) }, uFade: { value: 1 } },
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+  }), [color]);
+  const grid = useRef();
+  useFrame(({ camera }) => {
+    const d = camera.position.length();
+    const fade = THREE.MathUtils.smoothstep(d, 1.35, 2.6);
+    mat.uniforms.uFade.value = fade;
+    if (grid.current) grid.current.opacity = 0.045 * fade;
+  });
+  return (
+    <group position={center}>
+      <mesh material={mat} raycast={() => null}>
+        <sphereGeometry args={[radius, 96, 64]} />
+      </mesh>
+      <mesh raycast={() => null}>
+        <sphereGeometry args={[radius, 18, 12]} />
+        <meshBasicMaterial ref={grid} color={color} wireframe transparent opacity={0.045} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Trilateration in 3D: every satellite is the centre of a sphere whose radius is the measured distance.
+ * Pairs of spheres cross along circles in space; with a perfect clock all those circles meet at the phone.
+ */
+export function RangeSpheres({ sim }) {
+  const show = useStore((s) => s.show);
+  const mode = useStore((s) => s.mode);
+  const sats = useStore((s) => s.sats);
+  const color = (id) => sats.find((s) => s.id === id)?.color || '#fff';
+  const ids = mode === '3' ? sim.threeIds : sim.visible.map((m) => m.id);
+  const ms = sim.visible.filter((m) => ids.includes(m.id));
+  const rings = useMemo(() => {
+    if (ms.length > 4) return []; // 5+ spheres make too many crossing circles to read
+    const out = [];
+    for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) {
+      const pts = sphereSphereCircle(ms[i].ecef, ms[i].pseudorange, ms[j].ecef, ms[j].pseudorange, { segments: 200 });
+      if (pts) out.push({
+        key: ms[i].id + '-' + ms[j].id,
+        pts: pts.map(ecefToRender),
+        color: '#' + new THREE.Color(color(ms[i].id)).lerp(new THREE.Color(color(ms[j].id)), 0.5).getHexString(),
+      });
+    }
+    return out;
+  }, [sim, ids.join(','), sats]);
+  return (
+    <group>
+      {show.spheres && ms.map((m) => (
+        <RangeSphere key={m.id} center={ecefToRender(m.ecef)} radius={m.pseudorange / R_EARTH} color={color(m.id)} />
+      ))}
+      {show.sphereRings && rings.map((r) => (
+        <Line key={r.key} points={r.pts} color={r.color} lineWidth={1.6} transparent opacity={0.9} />
       ))}
     </group>
   );

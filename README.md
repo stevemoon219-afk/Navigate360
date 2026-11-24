@@ -10,8 +10,8 @@
 ## What you do (the 2-minute path)
 1. Press **START**. A guided tour (4 steps) runs on top of a 3D globe in space.
 2. The **green pin** is your phone. Drag it anywhere.
-3. Three satellites measure distances, but your phone's clock is 1 ms off (300 km). Their circles on the ground
-   **don't meet**, and the orange 3-satellite fix lands hundreds of km away, mostly *underground*.
+3. Three satellites measure distances, but your phone's clock is 1 ms off (300 km). Their 3D distance spheres
+   **don't meet** at one point, and the orange 3-satellite fix lands hundreds of km away, mostly *underground*.
 4. **Drag a 4th satellite** from the sidebar onto the globe. The blue 4-satellite fix snaps onto your phone and reports
    the clock error it solved for.
 5. **Slide the clock error.** Orange runs away; blue doesn't move. The chart shows this for every clock error.
@@ -28,7 +28,7 @@ satellite geometry presets (spread / bunched / in a line), the Gauss–Newton it
 | `solver3.js` | Exact 3-sphere intersection assuming a perfect clock (two mirror roots) |
 | `solver3Surface.js` | 3 satellites + "height = 0" pseudo-measurement (a "2D fix") |
 | `dop.js` | Q = (GᵀG)⁻¹ in East/North/Up → GDOP/PDOP/HDOP/VDOP/TDOP and the error ellipse |
-| `rangeCircle.js` | Where each distance sphere touches the Earth (law of cosines) |
+| `rangeCircle.js` | Where each distance sphere touches the Earth (law of cosines), and the 3D circle where two distance spheres cross |
 | `sweep.js`, `monteCarlo.js` | Error vs clock error chart; 200 noisy fixes for the street-level cloud |
 
 The solvers never see the true position: they receive only satellite positions and measured pseudoranges.
