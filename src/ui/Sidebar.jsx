@@ -149,7 +149,9 @@ export default function Sidebar({ sim }) {
       </Section>
 
       <Section title="Show on globe" icon="👁" defaultOpen={false}>
-        <Toggle label="Distance circles on the ground" k="circles" />
+        <Toggle label="3D distance spheres around each satellite" k="spheres" />
+        <Toggle label="Where the spheres cross each other (3D rings)" k="sphereRings" />
+        <Toggle label="Where each sphere touches the ground" k="circles" />
         <Toggle label="Circles after removing the solved clock error" k="corrected" />
         <Toggle label="Signal paths & pulses (slowed ~20×)" k="rays" />
         <Toggle label="3-sat mirror solution (ghost)" k="ghost" />

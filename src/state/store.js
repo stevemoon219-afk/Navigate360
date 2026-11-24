@@ -81,7 +81,7 @@ export const useStore = create(
       set: (patch) => set(patch),
 
       mode: 'compare', // 'compare' | '3' | '4'
-      show: { circles: true, corrected: false, rays: true, ghost: false, iterations: false },
+      show: { spheres: true, sphereRings: true, circles: true, corrected: false, rays: true, ghost: false, iterations: false },
       toggleShow: (k) => set((s) => ({ show: { ...s.show, [k]: !s.show[k] } })),
       stepperK: 0,
 

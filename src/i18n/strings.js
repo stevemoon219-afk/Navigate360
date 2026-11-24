@@ -8,7 +8,7 @@ const STRINGS = {
     headline: 'Your phone needs a 4th satellite because it doesn’t know the exact time.',
     loading: 'LOADING',
     coach1: 'This green pin is your phone. Drag it anywhere on Earth (or press “Drop pin”).',
-    coach2: 'Three satellites time their signals to you. But your phone’s clock is 1 ms off, so every distance is 300 km too long. The circles no longer meet, and the orange 3-satellite fix lands far away. Look how deep underground it thinks you are!',
+    coach2: 'Three satellites time their signals to you. But your phone’s clock is 1 ms off, so every distance is 300 km too long. The distance spheres around the satellites no longer meet at one point, and the orange 3-satellite fix lands far away. Look how deep underground it thinks you are!',
     coach3: 'Now drag the 4th satellite from the sidebar into the sky, away from the others.',
     coach4: 'The blue 4-satellite fix snapped onto your phone: it solved for the clock error too. Now slide the clock error: orange runs away, blue stays put.',
     coachDone: 'That’s why GPS needs four satellites: three for where, one more for when. Explore further: street-level zoom, geometry (DOP) and errors in “Go deeper”.',
